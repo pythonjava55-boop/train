@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RailGuard AI | Railway Safety Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="train.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="navbar">
+      <a href="#home" class="logo" aria-label="RailGuard AI home">
+        <span class="logo-mark"><i class="fa-solid fa-train-subway"></i></span>
+        <span>RailGuard AI</span>
+      </a>
+
+      <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <div class="nav-menu">
+        <a href="#home">Home</a>
+        <a href="#features">Features</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#about">About</a>
+        <a href="#team">Team</a>
+        <a href="#contact">Contact</a>
+        <a href="#dashboard" class="nav-cta">Get Started</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="hero section-shell">
+      <div class="hero-content reveal">
+        <div class="eyebrow"><i class="fa-solid fa-shield-halved"></i> Indian Railways Safety Intelligence</div>
+        <h1>AI-Powered Railway Safety &amp; Predictive Maintenance System</h1>
+        <p>Detect track defects, predict failures before they happen, and improve railway safety through artificial intelligence.</p>
+        <div class="hero-actions">
+          <a href="#dashboard" class="btn btn-primary"><i class="fa-solid fa-chart-line"></i> View Demo</a>
+          <a href="#features" class="btn btn-secondary"><i class="fa-solid fa-circle-info"></i> Learn More</a>
+        </div>
+        <div class="trust-strip" aria-label="System capabilities">
+          <span><i class="fa-solid fa-satellite-dish"></i> Live telemetry</span>
+          <span><i class="fa-solid fa-camera"></i> Vision AI</span>
+          <span><i class="fa-solid fa-bolt"></i> Instant alerts</span>
+        </div>
+      </div>
+
+      <div class="hero-visual reveal">
+        <div class="rail-illustration">
+          <div class="signal signal-red"></div>
+          <div class="signal signal-green"></div>
+          <div class="train-card">
+            <div class="train-head">
+              <span></span>
+              <span></span>
+            </div>
+            <div class="train-body">
+              <div class="train-window"></div>
+              <div class="train-window"></div>
+              <div class="train-window"></div>
+            </div>
+          </div>
+          <div class="scan-beam"></div>
+          <div class="rail-track">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="floating-panel panel-top">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div>
+              <strong>Crack detected</strong>
+              <small>Risk: Medium</small>
+            </div>
+          </div>
+          <div class="floating-panel panel-bottom">
+            <i class="fa-solid fa-brain"></i>
+            <div>
+              <strong>AI confidence</strong>
+              <small>95.8%</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="stats" class="stats-band">
+      <div class="stat-card reveal">
+        <strong data-count="95">0</strong><span>%</span>
+        <p>Detection Accuracy</p>
+      </div>
+      <div class="stat-card reveal">
+        <strong data-count="40">0</strong><span>%</span>
+        <p>Maintenance Cost Reduction</p>
+      </div>
+      <div class="stat-card reveal">
+        <strong data-count="60">0</strong><span>%</span>
+        <p>Faster Issue Detection</p>
+      </div>
+      <div class="stat-card reveal">
+        <strong>24/7</strong>
+        <p>Monitoring</p>
+      </div>
+    </section>
+
+    <section id="features" class="section-shell">
+      <div class="section-heading reveal">
+        <span>Core Features</span>
+        <h2>Built for safer, smarter rail networks</h2>
+        <p>RailGuard AI turns inspection data into rapid, actionable safety decisions for railway teams.</p>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card reveal">
+          <div class="feature-icon"><i class="fa-solid fa-road-barrier"></i></div>
+          <h3>Faulty Track Detection</h3>
+          <p>Detect cracks, broken rails, obstacles, and track defects using computer vision.</p>
+        </article>
+        <article class="feature-card reveal">
+          <div class="feature-icon"><i class="fa-solid fa-gears"></i></div>
+          <h3>Predictive Maintenance</h3>
+          <p>Predict equipment failures before breakdowns using intelligent analytics.</p>
+        </article>
+        <article class="feature-card reveal">
+          <div class="feature-icon"><i class="fa-solid fa-desktop"></i></div>
+          <h3>Real-Time Monitoring</h3>
+          <p>Monitor railway assets and track conditions in real time.</p>
+        </article>
+        <article class="feature-card reveal">
+          <div class="feature-icon"><i class="fa-solid fa-bell"></i></div>
+          <h3>Smart Alerts</h3>
+          <p>Instant notifications for critical maintenance and safety issues.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="workflow section-shell">
+      <div class="section-heading reveal">
+        <span>System Workflow</span>
+        <h2>From track input to maintenance action</h2>
+      </div>
+      <div class="timeline">
+        <div class="timeline-step reveal">
+          <i class="fa-solid fa-image"></i>
+          <h3>Track Image/Input</h3>
+        </div>
+        <div class="timeline-step reveal">
+          <i class="fa-solid fa-microchip"></i>
+          <h3>AI Detection Engine</h3>
+        </div>
+        <div class="timeline-step reveal">
+          <i class="fa-solid fa-chart-pie"></i>
+          <h3>Risk Analysis</h3>
+        </div>
+        <div class="timeline-step reveal">
+          <i class="fa-solid fa-screwdriver-wrench"></i>
+          <h3>Maintenance Recommendation</h3>
+        </div>
+        <div class="timeline-step reveal">
+          <i class="fa-solid fa-table-columns"></i>
+          <h3>Railway Dashboard</h3>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboard" class="dashboard-section section-shell">
+      <div class="section-heading reveal">
+        <span>Dashboard Preview</span>
+        <h2>Mission control for railway safety</h2>
+        <p>A focused operational view for health scores, active alerts, track status, equipment risk, and analytics.</p>
+      </div>
+
+      <div class="dashboard-mockup reveal">
+        <div class="dash-topbar">
+          <div>
+            <strong>RailGuard Operations</strong>
+            <small>Western Corridor | Live</small>
+          </div>
+          <div class="status-pill"><span></span> Online</div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="dash-card health-card">
+            <p>Health Score</p>
+            <div class="radial-score"><span>92</span></div>
+            <small>Network condition stable</small>
+          </div>
+          <div class="dash-card alert-card">
+            <p>Active Alerts</p>
+            <strong>08</strong>
+            <small>2 critical near Junction B</small>
+          </div>
+          <div class="dash-card">
+            <p>Track Status</p>
+            <div class="track-row"><span>North Line</span><b class="ok">Clear</b></div>
+            <div class="track-row"><span>Central Loop</span><b class="warn">Inspect</b></div>
+            <div class="track-row"><span>Yard Entry</span><b class="ok">Clear</b></div>
+          </div>
+          <div class="dash-card">
+            <p>Equipment Risk Levels</p>
+            <div class="risk-bar"><span style="width: 100%"></span></div>
+            <div class="risk-labels"><small>Low</small><small>Moderate</small><small>High</small></div>
+          </div>
+          <div class="dash-card chart-card">
+            <p>Analytics Charts</p>
+            <div class="distance-chart" aria-label="Train distance chart in thousand kilometers">
+              <div class="y-axis" aria-hidden="true">
+                <span>5000 km</span>
+                <span>3000 km</span>
+                <span>1000 km</span>
+                <span>0</span>
+              </div>
+              <div class="chart-area">
+                <div class="distance-bars">
+                  <div class="bar-item">
+                    <b>1.2k</b>
+                    <span class="bar" style="height: 24%"></span>
+                    <small>Train 1</small>
+                  </div>
+                  <div class="bar-item">
+                    <b>2.7k</b>
+                    <span class="bar" style="height: 54%"></span>
+                    <small>Train 2</small>
+                  </div>
+                  <div class="bar-item">
+                    <b>4.5k</b>
+                    <span class="bar" style="height: 90%"></span>
+                    <small>Train 3</small>
+                  </div>
+                  <div class="bar-item">
+                    <b>2.5k</b>
+                    <span class="bar" style="height: 50%"></span>
+                    <small>Train 4</small>
+                  </div>
+                  <div class="bar-item">
+                    <b>4.67k</b>
+                    <span class="bar" style="height: 93.4%"></span>
+                    <small>Train 5</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tech section-shell">
+      <div class="section-heading reveal">
+        <span>Technology Stack</span>
+        <h2>Intelligence layer for rail infrastructure</h2>
+      </div>
+      <div class="tech-grid">
+        <div class="tech-card reveal"><i class="fa-solid fa-camera-retro"></i> Computer Vision</div>
+        <div class="tech-card reveal"><i class="fa-solid fa-brain"></i> Artificial Intelligence</div>
+        <div class="tech-card reveal"><i class="fa-solid fa-network-wired"></i> Machine Learning</div>
+        <div class="tech-card reveal"><i class="fa-solid fa-cloud"></i> Cloud Analytics</div>
+        <div class="tech-card reveal"><i class="fa-solid fa-tower-broadcast"></i> Real-Time Monitoring</div>
+      </div>
+    </section>
+
+    <section id="about" class="about section-shell">
+      <div class="about-card reveal">
+        <div>
+          <span class="section-kicker">About Project</span>
+          <h2>Hackathon-built railway safety intelligence</h2>
+        </div>
+        <p>RailGuard AI is a futuristic railway safety solution designed to support Indian Railways-inspired infrastructure with computer vision, predictive analytics, and real-time monitoring. Built for a hackathon, the project demonstrates how AI can identify dangerous track conditions, prioritize maintenance, and give operations teams a fast, professional dashboard for safer decisions.</p>
+      </div>
+    </section>
+
+    <section id="team" class="team-strip section-shell">
+      <div class="section-heading reveal">
+        <span>Team</span>
+        <h2>Product, AI, and engineering working together</h2>
+      </div>
+      <div class="team-grid">
+        <div class="team-card reveal"><i class="fa-solid fa-user-gear"></i><strong>AI Engineer</strong><small>Detection models</small></div>
+        <div class="team-card reveal"><i class="fa-solid fa-user-shield"></i><strong>Safety Analyst</strong><small>Risk logic</small></div>
+        <div class="team-card reveal"><i class="fa-solid fa-code"></i><strong>Frontend Developer</strong><small>Dashboard UI</small></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact" class="footer">
+    <div class="footer-grid">
+      <div>
+        <a href="#home" class="logo">
+          <span class="logo-mark"><i class="fa-solid fa-train-subway"></i></span>
+          <span>RailGuard AI</span>
+        </a>
+        <p>AI-powered railway safety and predictive maintenance for smarter rail operations.</p>
+        <div class="socials">
+          <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+          <a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+        </div>
+      </div>
+      <div>
+        <h3>Quick Links</h3>
+        <a href="#features">Features</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#about">About</a>
+      </div>
+      <div>
+        <h3>Team</h3>
+        <a href="#team">Hackathon Team</a>
+        <a href="#features">AI Research</a>
+        <a href="#dashboard">Product Demo</a>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <p><i class="fa-solid fa-envelope"></i> hello@railguard.ai</p>
+        <p><i class="fa-solid fa-location-dot"></i> India</p>
+        <p><i class="fa-solid fa-phone"></i> +91 90000 00000</p>
+      </div>
+    </div>
+    <div class="footer-bottom">RailGuard AI © 2026. Built for safer railways.</div>
+  </footer>
+
+  <script src="train.js"></script>
+</body>
+</html>
