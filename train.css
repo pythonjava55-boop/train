@@ -85,10 +85,11 @@ a {
 }
 
 .logo-mark {
-  display: grid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 38px;
   height: 38px;
-  place-items: center;
   color: var(--white);
   border-radius: 8px;
   background: linear-gradient(135deg, #087ca6, #5ad9f7);
@@ -909,19 +910,20 @@ a {
   margin-top: 14px;
 }
 
-.socials {
+.footer .socials {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-top: 18px;
 }
 
-.socials a {
+.footer .socials a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 38px;
   height: 38px;
+  flex: 0 0 38px;
   margin: 0;
   padding: 0;
   line-height: 1;
@@ -930,7 +932,7 @@ a {
   background: rgba(255, 255, 255, 0.08);
 }
 
-.socials a i {
+.footer .socials a i {
   display: inline-flex;
   align-items: center;
   justify-content: center;
