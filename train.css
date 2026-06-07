@@ -218,7 +218,7 @@ a {
 .section-heading p,
 .about-card p,
 .footer p {
-    
+
   color: #ffffff;
   line-height: 1.7;
   font-size: 25px;
@@ -628,6 +628,7 @@ a {
   padding: 22px;
   border: 1px solid var(--border);
   border-radius: 8px;
+  width: 1193px;
   background:
     linear-gradient(140deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.52)),
     radial-gradient(circle at 85% 10%, rgba(8, 124, 166, 0.18), transparent 34%);
@@ -658,7 +659,7 @@ a {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  color:black;
+  color: black;
   border: 1px solid rgba(56, 247, 161, 0.34);
   border-radius: 8px;
   background: rgba(0, 0, 0, 12%);
@@ -739,7 +740,7 @@ a {
 }
 
 .warn {
-  color:#5e4b1e;
+  color: #5e4b1e;
 }
 
 .risk-bar {
@@ -749,7 +750,7 @@ a {
   background: rgba(255, 255, 255, 0.12);
 }
 
-.risk-bar span {    
+.risk-bar span {
   display: block;
   height: 100%;
   border-radius: inherit;
@@ -785,6 +786,10 @@ a {
 .chart-area {
   position: relative;
   min-width: 0;
+  height: 237px;
+  /* extra room for labels */
+  overflow: visible;
+  /* give it an explicit height */
   border-left: 1px solid rgba(8, 124, 166, 0.26);
   border-bottom: 1px solid rgba(8, 124, 166, 0.26);
   background:
@@ -793,26 +798,38 @@ a {
 }
 
 .distance-bars {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(38px, 1fr));
-  align-items: end;
-  gap: 12px;
-  height: 150px;
-  padding: 18px 12px 0;
+  display: flex;
+  /* switch from grid to flex */
+  flex-direction: row;
+  align-items: flex-end;
+  /* all bars grow UP from the bottom */
+  justify-content: space-around;
+  height: 237px;
+  padding: 0 12px;
+  position: absolute;
+  /* sit inside .chart-area */
+  bottom: 0;
+  /* anchor to the bottom border */
+  left: 0;
+  right: 0;
 }
 
 .bar-item {
-  display: grid;
-  grid-template-rows: 18px 1fr 24px;
-  align-items: end;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
   height: 100%;
   min-width: 0;
+  position: relative;
+  margin-bottom: -18px;
 }
 
 .bar-item b {
   color: var(--blue);
   font-size: 0.72rem;
+  margin-bottom: 4px;
+  line-height: 1;
 }
 
 .bar {
@@ -825,11 +842,14 @@ a {
 }
 
 .bar-item small {
-  align-self: center;
+  position: absolute;
+  bottom: -24px;
+  /* pushes label below graph line */
   color: var(--muted);
   font-size: 0.7rem;
   font-weight: 700;
   white-space: nowrap;
+
 }
 
 .tech-grid {
@@ -1170,7 +1190,7 @@ a {
 
 .score-card,
 .risk-card,
-.report-details > div {
+.report-details>div {
   padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
@@ -1307,7 +1327,7 @@ a {
     padding: 18px;
     border: 1px solid var(--border);
     border-radius: 8px;
-  background: rgba(255, 255, 255, 0.94);
+    background: rgba(255, 255, 255, 0.94);
     box-shadow: var(--shadow);
     backdrop-filter: blur(18px);
     transform: translateY(-12px);
@@ -1515,4 +1535,12 @@ a {
   .dashboard-mockup {
     padding: 14px;
   }
+}
+
+.content-wrapper {
+  border: 10px solid #0be08b;
+  height: 100%;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 100px;
 }
