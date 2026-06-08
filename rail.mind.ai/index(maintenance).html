@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="train.css">
 </head>
+
 <body class="maintenance-page">
   <header class="site-header">
     <nav class="navbar">
@@ -22,13 +24,17 @@
         <i class="fa-solid fa-bars"></i>
       </button>
 
-        <div class="nav-menu">
+      <div class="nav-menu">
         <a href="index4.html">Home</a>
         <a href="delay.html">Delay Predictor</a>
         <a href="crowd.html">Station Commander</a>
         <a href="safety.html">Track Safety</a>
-        
-        <a href="delay.html" class="nav-cta">Get Started</a>
+        <a href="index(maintenance).html" style="color: var(--blue)"> Train Maintenance</a>
+        <a href="index(maintenance).html" class="nav-cta"><i class="fa-solid fa-train-subway"></i> Train Maintenance</a>
+
+
+
+
       </div>
     </nav>
   </header>
@@ -38,7 +44,8 @@
       <div class="maintenance-hero-content reveal">
         <div class="eyebrow"><i class="fa-solid fa-screwdriver-wrench"></i> Predictive Maintenance Console</div>
         <h1>Train Health Assessment &amp; Predictive Maintenance</h1>
-        <p>Complete the mandatory pre-departure inspection checklist. RailGuard AI will analyze the train's condition and determine whether it is safe to operate.</p>
+        <p>Complete the mandatory pre-departure inspection checklist. RailGuard AI will analyze the train's condition
+          and determine whether it is safe to operate.</p>
       </div>
 
       <div class="maintenance-status-panel reveal" aria-label="Inspection readiness summary">
@@ -172,7 +179,8 @@
           <div class="form-grid">
             <label>
               Fire Extinguisher Pressure (PSI)
-              <input type="number" name="fireExtinguisherPressure" min="0" max="300" step="0.1" placeholder="150" required>
+              <input type="number" name="fireExtinguisherPressure" min="0" max="300" step="0.1" placeholder="150"
+                required>
             </label>
             <label>
               Emergency Exit Opening Time (s)
@@ -280,4 +288,5 @@
 
   <script src="train.js"></script>
 </body>
+
 </html>
