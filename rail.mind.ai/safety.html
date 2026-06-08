@@ -1,0 +1,1096 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Track Safety | RailMind AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="train.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+      /* ── Page layout ─────────────────────────────────────────── */
+      .page-hero {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        gap: 52px;
+        min-height: 100vh;
+        padding-top: 100px;
+        width: min(1200px, calc(100% - 36px));
+        margin: 0 auto;
+      }
+      .page-hero-content h1 {
+        font-size: clamp(2.6rem, 5vw, 4rem);
+        color: var(--navy);
+        line-height: 1.03;
+        margin-bottom: 16px;
+      }
+      .page-hero-content p {
+        font-size: 1.05rem;
+        color: var(--muted);
+        line-height: 1.7;
+        max-width: 480px;
+      }
+      .hero-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 28px;
+      }
+      .hero-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--glass);
+        backdrop-filter: blur(14px);
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--navy);
+      }
+      .hero-chip i {
+        color: var(--cyan);
+      }
+
+      /* ── Upload panel ────────────────────────────────────────── */
+      .upload-panel {
+        padding: 32px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--glass-strong);
+        backdrop-filter: blur(22px);
+        box-shadow: var(--shadow);
+      }
+      .upload-panel h2 {
+        font-size: 1.25rem;
+        color: var(--navy);
+        margin-bottom: 6px;
+      }
+      .upload-panel > p {
+        font-size: 0.88rem;
+        color: var(--muted);
+        margin-bottom: 22px;
+      }
+
+      .drop-zone {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        min-height: 220px;
+        border: 2px dashed rgba(8, 124, 166, 0.35);
+        border-radius: 12px;
+        background: rgba(8, 124, 166, 0.04);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+        padding: 24px;
+      }
+      .drop-zone:hover,
+      .drop-zone.dragover {
+        border-color: var(--cyan);
+        background: rgba(90, 217, 247, 0.08);
+        box-shadow: 0 0 0 4px rgba(90, 217, 247, 0.15);
+      }
+      .drop-zone input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+      }
+      .drop-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        background: linear-gradient(
+          135deg,
+          rgba(8, 124, 166, 0.12),
+          rgba(90, 217, 247, 0.18)
+        );
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        color: var(--blue);
+      }
+      .drop-zone h3 {
+        font-size: 1rem;
+        color: var(--navy);
+      }
+      .drop-zone p {
+        font-size: 0.82rem;
+        color: var(--muted);
+      }
+      .drop-zone .file-types {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .file-type-tag {
+        padding: 3px 10px;
+        border-radius: 6px;
+        background: rgba(8, 124, 166, 0.08);
+        font-size: 0.74rem;
+        font-weight: 700;
+        color: var(--blue);
+      }
+      .preview-wrap {
+        display: none;
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+        max-height: 200px;
+      }
+      .preview-wrap img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+      }
+      .preview-wrap .change-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        border: none;
+        border-radius: 8px;
+        background: rgba(5, 56, 75, 0.78);
+        color: #fff;
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+      }
+
+      .analyze-btn {
+        width: 100%;
+        min-height: 56px;
+        margin-top: 16px;
+        font-size: 1rem;
+        font-weight: 800;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #087ca6, #5ad9f7);
+        box-shadow: 0 14px 36px rgba(8, 124, 166, 0.26);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .analyze-btn:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 48px rgba(8, 124, 166, 0.3);
+      }
+      .analyze-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .model-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+      .status-ai {
+        background: rgba(14, 191, 122, 0.1);
+        color: #0a9e66;
+        border: 1px solid rgba(14, 191, 122, 0.25);
+      }
+      .status-mock {
+        background: rgba(14, 130, 219, 0.08);
+        color: #0a6ebd;
+        border: 1px solid rgba(14, 130, 219, 0.25);
+      }
+
+      /* ── Loading ─────────────────────────────────────────────── */
+      .spinner {
+        width: 42px;
+        height: 42px;
+        border: 4px solid rgba(8, 124, 166, 0.14);
+        border-top-color: var(--blue);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .loading-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        padding: 60px;
+        text-align: center;
+      }
+
+      /* ── Results ─────────────────────────────────────────────── */
+      .results-section {
+        width: min(1200px, calc(100% - 36px));
+        margin: 0 auto 80px;
+      }
+      .result-hero-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+      .result-card {
+        padding: 28px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--glass-strong);
+        backdrop-filter: blur(18px);
+        box-shadow: var(--shadow);
+      }
+      .defect-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      .defect-name {
+        font-size: 2.6rem;
+        font-weight: 800;
+        color: var(--navy);
+        line-height: 1.1;
+        margin-bottom: 16px;
+        text-transform: capitalize;
+      }
+      .severity-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 18px;
+        border-radius: 10px;
+        font-size: 0.88rem;
+        font-weight: 900;
+        letter-spacing: 0.03em;
+      }
+      .sev-none {
+        background: rgba(14, 191, 122, 0.12);
+        color: #0a9e66;
+        border: 1px solid rgba(14, 191, 122, 0.3);
+      }
+      .sev-medium {
+        background: rgba(224, 160, 0, 0.12);
+        color: #b37a00;
+        border: 1px solid rgba(224, 160, 0, 0.3);
+      }
+      .sev-high {
+        background: rgba(217, 52, 69, 0.12);
+        color: #d93445;
+        border: 1px solid rgba(217, 52, 69, 0.3);
+      }
+      .sev-critical {
+        background: rgba(217, 52, 69, 0.22);
+        color: #c02030;
+        border: 2px solid rgba(217, 52, 69, 0.5);
+        animation: blink-border 1.2s ease infinite;
+      }
+      @keyframes blink-border {
+        50% {
+          border-color: rgba(217, 52, 69, 0.15);
+        }
+      }
+
+      .safe-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.84rem;
+        font-weight: 800;
+        margin-top: 14px;
+      }
+      .safe-yes {
+        background: rgba(14, 191, 122, 0.12);
+        color: #0a9e66;
+      }
+      .safe-no {
+        background: rgba(217, 52, 69, 0.12);
+        color: #d93445;
+      }
+
+      /* Confidence meter */
+      .confidence-section {
+        margin-top: 20px;
+      }
+      .conf-bar-wrap {
+        margin-top: 10px;
+      }
+      .conf-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .conf-track {
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(8, 124, 166, 0.1);
+        overflow: hidden;
+      }
+      .conf-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #087ca6, #5ad9f7);
+        transition: width 0.8s ease;
+      }
+
+      /* Alert box */
+      .alert-card {
+        grid-column: 1 / -1;
+        padding: 22px 26px;
+        border-radius: 12px;
+        border-left: 5px solid;
+      }
+      .alert-none {
+        border-color: #0ebf7a;
+        background: rgba(14, 191, 122, 0.06);
+      }
+      .alert-medium {
+        border-color: #e0a000;
+        background: rgba(224, 160, 0, 0.06);
+      }
+      .alert-high {
+        border-color: #d93445;
+        background: rgba(217, 52, 69, 0.06);
+      }
+      .alert-critical {
+        border-color: #c02030;
+        background: rgba(192, 32, 48, 0.1);
+      }
+
+      .alert-title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      .alert-msg {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--navy);
+        line-height: 1.6;
+      }
+      .rec-msg {
+        margin-top: 12px;
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        font-size: 0.88rem;
+        color: var(--muted);
+      }
+      .rec-msg i {
+        color: var(--cyan);
+        margin-top: 2px;
+        flex-shrink: 0;
+      }
+
+      /* Scores chart */
+      .scores-card {
+        grid-column: 1 / -1;
+      }
+      .scores-chart-wrap {
+        height: 200px;
+        margin-top: 14px;
+      }
+
+      /* ── Recent analyses ─────────────────────────────────────── */
+      .recent-section {
+        width: min(1200px, calc(100% - 36px));
+        margin: 0 auto 100px;
+      }
+      .recent-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 14px;
+      }
+      .recent-card {
+        padding: 18px 20px;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: var(--glass);
+        backdrop-filter: blur(14px);
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .recent-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow);
+      }
+      .recent-defect {
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--navy);
+        text-transform: capitalize;
+        margin-bottom: 8px;
+      }
+      .recent-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .recent-time {
+        font-size: 0.74rem;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+
+      @media (max-width: 900px) {
+        .page-hero {
+          grid-template-columns: 1fr;
+          padding-top: 120px;
+        }
+        .result-hero-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── Nav ──────────────────────────────────────────────────── -->
+    <header class="site-header">
+      <nav class="navbar">
+        <a href="index4.html" class="logo" aria-label="RailMind AI home">
+          <span class="logo-mark"
+            ><i class="fa-solid fa-train-subway"></i
+          ></span>
+          <span>RailMind AI</span>
+        </a>
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-label="Toggle navigation"
+          aria-expanded="false"
+        >
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="nav-menu">
+          <a href="index4.html">Home</a>
+          <a href="delay.html">Delay Predictor</a>
+          <a href="crowd.html">Station Commander</a>
+          <a href="safety.html" style="color: var(--blue)">Track Safety</a>
+          <a href="safety.html" class="nav-cta"
+            ><i class="fa-solid fa-eye"></i> Analyze Track</a
+          >
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <!-- ── Hero + Upload ────────────────────────────────────────── -->
+      <div class="page-hero">
+        <div class="page-hero-content reveal">
+          <div class="eyebrow">
+            <i class="fa-solid fa-shield-halved"></i> AI Vision Safety
+          </div>
+          <h1>Detect track defects before trains do</h1>
+          <p>
+            Upload any railway track image. Our CLIP vision AI instantly
+            classifies defects, assesses severity, and the RailMind Agent
+            generates an official maintenance alert.
+          </p>
+          <div class="hero-chips">
+            <span class="hero-chip"
+              ><i class="fa-solid fa-circle-check"></i> Normal track</span
+            >
+            <span class="hero-chip"
+              ><i class="fa-solid fa-triangle-exclamation"></i> Crack
+              detection</span
+            >
+            <span class="hero-chip"
+              ><i class="fa-solid fa-screwdriver-wrench"></i> Missing bolt</span
+            >
+            <span class="hero-chip"
+              ><i class="fa-solid fa-x"></i> Rail break</span
+            >
+            <span class="hero-chip"
+              ><i class="fa-solid fa-box"></i> Debris</span
+            >
+            <span class="hero-chip"
+              ><i class="fa-solid fa-arrows-left-right"></i> Misalignment</span
+            >
+          </div>
+        </div>
+
+        <div class="upload-panel reveal">
+          <h2>
+            <i class="fa-solid fa-camera" style="color: var(--blue)"></i> Track
+            Image Analysis
+          </h2>
+          <p>Upload a track photo for instant AI safety classification.</p>
+
+          <!-- Drop zone -->
+          <div class="drop-zone" id="dropZone">
+            <input type="file" id="fileInput" accept="image/*" />
+            <div class="drop-icon">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <h3>Drop track image here</h3>
+            <p>or click to browse files</p>
+            <div class="file-types">
+              <span class="file-type-tag">JPEG</span>
+              <span class="file-type-tag">PNG</span>
+              <span class="file-type-tag">WEBP</span>
+              <span class="file-type-tag">BMP</span>
+            </div>
+          </div>
+
+          <!-- Preview -->
+          <div class="preview-wrap" id="previewWrap">
+            <img id="previewImg" src="" alt="Track preview" />
+            <button class="change-btn" onclick="resetUpload()">
+              <i class="fa-solid fa-rotate"></i> Change
+            </button>
+          </div>
+
+          <button class="analyze-btn" id="analyzeBtn" disabled>
+            <i class="fa-solid fa-eye"></i> Analyze Track
+          </button>
+
+          <!-- Model status -->
+          <div class="model-status" id="modelStatus">
+            <div
+              class="spinner"
+              style="width: 16px; height: 16px; border-width: 2px"
+            ></div>
+            Checking model status…
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Loading ──────────────────────────────────────────────── -->
+      <div id="loadingPanel" class="loading-panel" style="display: none">
+        <div class="spinner"></div>
+        <p style="color: var(--navy); font-weight: 700">
+          Running CLIP vision analysis…
+        </p>
+        <small style="color: var(--muted)"
+          >Comparing track image against 6 defect categories</small
+        >
+      </div>
+
+      <!-- ── Results ──────────────────────────────────────────────── -->
+      <div id="resultsSection" class="results-section" style="display: none">
+        <div class="section-heading" style="margin-bottom: 28px">
+          <span>Analysis Result</span>
+          <h2>Track safety report</h2>
+        </div>
+
+        <div class="result-hero-grid">
+          <!-- Main result -->
+          <div class="result-card">
+            <p class="defect-label">Detected defect</p>
+            <p class="defect-name" id="defectName">—</p>
+            <span class="severity-badge" id="severityBadge">—</span>
+            <div>
+              <span class="safe-pill" id="safePill">—</span>
+            </div>
+            <p
+              style="
+                font-size: 0.9rem;
+                color: var(--muted);
+                margin-top: 18px;
+                line-height: 1.6;
+              "
+              id="descText"
+            >
+              —
+            </p>
+          </div>
+
+          <!-- Confidence card -->
+          <div class="result-card">
+            <p class="defect-label">Detection confidence</p>
+            <p
+              style="
+                font-size: 3.2rem;
+                font-weight: 800;
+                color: var(--navy);
+                line-height: 1;
+                margin-bottom: 6px;
+              "
+              id="confPercent"
+            >
+              —
+            </p>
+            <div class="conf-bar-wrap">
+              <div class="conf-label">
+                <span>Confidence level</span>
+                <span id="confLabel">—</span>
+              </div>
+              <div class="conf-track">
+                <div class="conf-fill" id="confFill" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="confidence-section">
+              <p
+                style="
+                  font-size: 0.8rem;
+                  font-weight: 700;
+                  color: var(--muted);
+                  margin-top: 20px;
+                  margin-bottom: 8px;
+                "
+              >
+                All class scores
+              </p>
+              <div
+                id="scoresBreakdown"
+                style="display: flex; flex-direction: column; gap: 5px"
+              ></div>
+            </div>
+          </div>
+
+          <!-- AI Alert card -->
+          <div class="alert-card" id="alertCard">
+            <p class="alert-title">
+              <i class="fa-solid fa-robot"></i> RailMind Agent — Maintenance
+              Alert
+            </p>
+            <p class="alert-msg" id="alertMsg">—</p>
+            <div class="rec-msg">
+              <i class="fa-solid fa-screwdriver-wrench"></i>
+              <span id="recMsg">—</span>
+            </div>
+          </div>
+
+          <!-- Scores chart -->
+          <div class="result-card scores-card">
+            <p class="defect-label">
+              Probability distribution across all defect classes
+            </p>
+            <div class="scores-chart-wrap">
+              <canvas id="scoresChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <button
+          class="analyze-btn"
+          style="max-width: 320px; margin: 0 auto; display: flex"
+          onclick="resetForNew()"
+        >
+          <i class="fa-solid fa-rotate"></i> Analyze Another Image
+        </button>
+      </div>
+
+      <!-- ── Recent analyses ───────────────────────────────────────── -->
+      <div class="recent-section" id="recentSection" style="display: none">
+        <div class="section-heading" style="margin-bottom: 24px">
+          <span>Session History</span>
+          <h2>Recent track analyses</h2>
+          <p style="font-size: 0.88rem; color: var(--muted); margin-top: 8px">
+            Resets when server restarts.
+          </p>
+        </div>
+        <div class="recent-grid" id="recentGrid"></div>
+      </div>
+    </main>
+
+    <!-- ── Footer ───────────────────────────────────────────────── -->
+    <footer class="footer">
+      <div class="footer-grid">
+        <div>
+          <a href="index4.html" class="logo">
+            <span class="logo-mark"
+              ><i class="fa-solid fa-train-subway"></i
+            ></span>
+            <span>RailMind AI</span>
+          </a>
+          <p>
+            AI-powered Indian Railways intelligence — delay prediction, crowd
+            forecasting, track safety.
+          </p>
+        </div>
+        <div>
+          <h3>Modules</h3>
+          <a href="delay.html">Delay Predictor</a
+          ><a href="crowd.html">Station Commander</a
+          ><a href="safety.html">Track Safety</a>
+        </div>
+        <div>
+          <h3>Project</h3>
+          <a href="index4.html#about">About</a
+          ><a href="index4.html#team">Team</a
+          ><a href="index4.html#features">Features</a>
+        </div>
+        <div>
+          <h3>Built for</h3>
+          <p><i class="fa-solid fa-trophy"></i> FAR AWAY 2026</p>
+          <p><i class="fa-solid fa-train"></i> Railway Theme</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        RailMind AI © 2026 · FAR AWAY Hackathon · Railway Theme
+      </div>
+    </footer>
+
+    <script src="train.js"></script>
+    <script>
+      const API = "https://railmindbackend-production.up.railway.app";
+      let scoresChartInst = null;
+      let selectedFile = null;
+
+      Chart.defaults.font.family = "Inter, system-ui, sans-serif";
+      Chart.defaults.color = "#426c79";
+
+      // ── Check model status ───────────────────────────────────────
+      async function checkModelStatus() {
+        const el = document.getElementById("modelStatus");
+        try {
+          const res = await fetch(`${API}/safety/status`);
+          const data = await res.json();
+          el.className =
+            "model-status " +
+            (data.clip_model_loaded ? "status-ai" : "status-mock");
+          el.innerHTML = data.clip_model_loaded
+            ? '<i class="fa-solid fa-circle-check"></i> CLIP model loaded — AI mode active'
+            : '<i class="fa-solid fa-bolt"></i> AI ready — CLIP loads automatically on first analysis';
+        } catch (e) {
+          el.className = "model-status status-mock";
+          el.innerHTML =
+            '<i class="fa-solid fa-wifi"></i> Backend offline — check localhost:8000';
+        }
+      }
+
+      // ── File input & drag-drop ───────────────────────────────────
+      const fileInput = document.getElementById("fileInput");
+      const dropZone = document.getElementById("dropZone");
+      const previewWrap = document.getElementById("previewWrap");
+      const previewImg = document.getElementById("previewImg");
+
+      fileInput.addEventListener("change", () =>
+        handleFile(fileInput.files[0]),
+      );
+
+      dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.classList.add("dragover");
+      });
+      dropZone.addEventListener("dragleave", () =>
+        dropZone.classList.remove("dragover"),
+      );
+      dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+        handleFile(e.dataTransfer.files[0]);
+      });
+
+      function handleFile(file) {
+        if (!file || !file.type.startsWith("image/")) {
+          alert("Please upload an image file (JPEG, PNG, WEBP, BMP).");
+          return;
+        }
+        selectedFile = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          dropZone.style.display = "none";
+          previewWrap.style.display = "block";
+          document.getElementById("analyzeBtn").disabled = false;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function resetUpload() {
+        selectedFile = null;
+        fileInput.value = "";
+        previewImg.src = "";
+        dropZone.style.display = "flex";
+        previewWrap.style.display = "none";
+        document.getElementById("analyzeBtn").disabled = true;
+      }
+
+      function resetForNew() {
+        resetUpload();
+        document.getElementById("resultsSection").style.display = "none";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      // ── Helpers ──────────────────────────────────────────────────
+      function severityClass(s) {
+        return (
+          {
+            none: "sev-none",
+            medium: "sev-medium",
+            high: "sev-high",
+            critical: "sev-critical",
+          }[s] || "sev-none"
+        );
+      }
+      function severityIcon(s) {
+        return (
+          {
+            none: "fa-circle-check",
+            medium: "fa-triangle-exclamation",
+            high: "fa-exclamation-circle",
+            critical: "fa-skull-crossbones",
+          }[s] || "fa-circle-check"
+        );
+      }
+      function severityLabel(s) {
+        return (
+          {
+            none: "SAFE",
+            medium: "MEDIUM RISK",
+            high: "HIGH RISK",
+            critical: "⚠ CRITICAL",
+          }[s] || s?.toUpperCase()
+        );
+      }
+      function alertClass(s) {
+        return (
+          {
+            none: "alert-none",
+            medium: "alert-medium",
+            high: "alert-high",
+            critical: "alert-critical",
+          }[s] || "alert-none"
+        );
+      }
+      function scoreColor(cls, isTop) {
+        if (isTop) return "rgba(8,124,166,0.85)";
+        return "rgba(8,124,166,0.3)";
+      }
+
+      // ── Analyze ──────────────────────────────────────────────────
+      document
+        .getElementById("analyzeBtn")
+        .addEventListener("click", async () => {
+          if (!selectedFile) return;
+
+          document.getElementById("resultsSection").style.display = "none";
+          document.getElementById("loadingPanel").style.display = "flex";
+          document.getElementById("analyzeBtn").disabled = true;
+          document.getElementById("analyzeBtn").innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing…';
+
+          try {
+            const formData = new FormData();
+            formData.append("file", selectedFile);
+
+            const res = await fetch(`${API}/safety/analyze`, {
+              method: "POST",
+              body: formData,
+            });
+            if (!res.ok) throw new Error(`API error ${res.status}`);
+            const d = await res.json();
+
+            document.getElementById("loadingPanel").style.display = "none";
+            renderResults(d);
+            loadRecentAnalyses();
+          } catch (err) {
+            document.getElementById("loadingPanel").style.display = "none";
+            alert(
+              `Analysis failed: ${err.message}\n\nMake sure backend is running at ${API}`,
+            );
+          } finally {
+            document.getElementById("analyzeBtn").disabled = false;
+            document.getElementById("analyzeBtn").innerHTML =
+              '<i class="fa-solid fa-eye"></i> Analyze Track';
+          }
+        });
+
+      // ── Render results ───────────────────────────────────────────
+      function renderResults(d) {
+        const defectReadable = d.defect_type?.replace(/_/g, " ") || "—";
+        document.getElementById("defectName").textContent = defectReadable;
+        document.getElementById("descText").textContent = d.description || "";
+
+        const sev = d.severity || "none";
+        const sevBadge = document.getElementById("severityBadge");
+        sevBadge.className = "severity-badge " + severityClass(sev);
+        sevBadge.innerHTML = `<i class="fa-solid ${severityIcon(sev)}"></i> ${severityLabel(sev)}`;
+
+        const safePill = document.getElementById("safePill");
+        if (d.safe_to_operate) {
+          safePill.className = "safe-pill safe-yes";
+          safePill.innerHTML =
+            '<i class="fa-solid fa-circle-check"></i> Safe to Operate';
+        } else {
+          safePill.className = "safe-pill safe-no";
+          safePill.innerHTML = '<i class="fa-solid fa-ban"></i> Do NOT Operate';
+        }
+
+        // Confidence
+        const confPct = Math.round((d.confidence || 0) * 100);
+        document.getElementById("confPercent").textContent = confPct + "%";
+        document.getElementById("confFill").style.width = confPct + "%";
+        document.getElementById("confLabel").textContent =
+          confPct >= 85
+            ? "Very High"
+            : confPct >= 70
+              ? "High"
+              : confPct >= 55
+                ? "Moderate"
+                : "Low";
+
+        // Scores breakdown (inline bars)
+        const scores = d.all_scores || {};
+        const breakdown = document.getElementById("scoresBreakdown");
+        const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+        breakdown.innerHTML = sortedScores
+          .map(([cls, score]) => {
+            const pct = Math.round(score * 100);
+            const isTop = cls === d.defect_type;
+            return `
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="width:130px;font-size:0.74rem;font-weight:700;color:${isTop ? "var(--blue)" : "var(--muted)"};text-transform:capitalize;flex-shrink:0">${cls.replace(/_/g, " ")}</span>
+            <div style="flex:1;height:6px;border-radius:999px;background:rgba(8,124,166,0.1)">
+              <div style="height:100%;border-radius:999px;width:${pct}%;background:${isTop ? "linear-gradient(90deg,#087ca6,#5ad9f7)" : "rgba(8,124,166,0.3)"};transition:width 0.7s ease"></div>
+            </div>
+            <span style="font-size:0.74rem;font-weight:700;color:${isTop ? "var(--blue)" : "var(--muted)"};width:32px;text-align:right">${pct}%</span>
+          </div>
+        `;
+          })
+          .join("");
+
+        // Alert card
+        const alertCard = document.getElementById("alertCard");
+        alertCard.className = "alert-card " + alertClass(sev);
+        document.getElementById("alertMsg").textContent =
+          d.alert_message || d.description || "—";
+        document.getElementById("recMsg").textContent =
+          d.recommended_action || "—";
+
+        // Chart
+        renderScoresChart(scores, d.defect_type);
+
+        document.getElementById("resultsSection").style.display = "block";
+        document
+          .getElementById("resultsSection")
+          .scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      // ── Scores chart ─────────────────────────────────────────────
+      function renderScoresChart(scores, topClass) {
+        if (scoresChartInst) scoresChartInst.destroy();
+        const ctx = document.getElementById("scoresChart").getContext("2d");
+        const labels = Object.keys(scores).map((k) => k.replace(/_/g, " "));
+        const values = Object.values(scores).map((v) => Math.round(v * 100));
+        const bgColors = Object.keys(scores).map((k) =>
+          k === topClass ? "rgba(8,124,166,0.85)" : "rgba(8,124,166,0.22)",
+        );
+        scoresChartInst = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Confidence %",
+                data: values,
+                backgroundColor: bgColors,
+                borderRadius: 6,
+                borderSkipped: false,
+              },
+            ],
+          },
+          options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: { label: (c) => ` ${c.parsed.x}% confidence` },
+              },
+            },
+            scales: {
+              x: {
+                max: 100,
+                grid: { color: "rgba(8,124,166,0.08)" },
+                ticks: { callback: (v) => v + "%" },
+              },
+              y: { grid: { display: false } },
+            },
+          },
+        });
+      }
+
+      // ── Recent analyses ──────────────────────────────────────────
+      async function loadRecentAnalyses() {
+        try {
+          const res = await fetch(`${API}/safety/recent`);
+          const data = await res.json();
+          if (!data.analyses?.length) return;
+
+          const grid = document.getElementById("recentGrid");
+          grid.innerHTML = data.analyses
+            .slice()
+            .reverse()
+            .map((a) => {
+              const sev = a.severity || "none";
+              const defect = (a.defect_type || "").replace(/_/g, " ");
+              const ts = new Date(a.analysis_timestamp).toLocaleTimeString();
+              return `
+            <div class="recent-card reveal">
+              <p class="recent-defect"><i class="fa-solid fa-eye" style="color:var(--cyan);margin-right:6px"></i>${defect}</p>
+              <div class="recent-meta">
+                <span class="severity-badge ${severityClass(sev)}" style="padding:4px 10px;font-size:0.75rem">
+                  <i class="fa-solid ${severityIcon(sev)}"></i> ${severityLabel(sev)}
+                </span>
+                <span style="font-size:0.78rem;color:var(--muted)">${Math.round(a.confidence * 100)}% confidence</span>
+              </div>
+              <p class="recent-time"><i class="fa-regular fa-clock" style="margin-right:4px"></i>${ts}</p>
+            </div>
+          `;
+            })
+            .join("");
+
+          document.getElementById("recentSection").style.display = "block";
+          document.querySelectorAll("#recentGrid .reveal").forEach((el, i) => {
+            el.style.transitionDelay = `${i * 60}ms`;
+            setTimeout(() => el.classList.add("visible"), 50);
+          });
+        } catch (e) {
+          /* silent */
+        }
+      }
+
+      // ── Init ─────────────────────────────────────────────────────
+      checkModelStatus();
+      loadRecentAnalyses();
+    </script>
+  </body>
+</html>

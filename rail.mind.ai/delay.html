@@ -1,0 +1,1092 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Delay Predictor | RailMind AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link rel="stylesheet" href="train.css" />
+    <style>
+      /* ── Page-specific design tokens ─────────────────────────── */
+      .page-hero {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        gap: 52px;
+        min-height: 100vh;
+        padding-top: 100px;
+        width: min(1200px, calc(100% - 36px));
+        margin: 0 auto;
+      }
+      .page-hero-content h1 {
+        font-size: clamp(2.6rem, 5vw, 4rem);
+        line-height: 1.03;
+        color: var(--navy);
+        margin-bottom: 16px;
+      }
+      .page-hero-content p {
+        font-size: 1.08rem;
+        color: var(--muted);
+        line-height: 1.7;
+        max-width: 480px;
+      }
+      .mini-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 32px;
+      }
+      .mini-stat {
+        padding: 16px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--glass);
+        backdrop-filter: blur(14px);
+        text-align: center;
+      }
+      .mini-stat strong {
+        display: block;
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--blue);
+      }
+      .mini-stat span {
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+
+      /* ── Form panel ──────────────────────────────────────────── */
+      .form-panel {
+        padding: 32px;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        background: var(--glass-strong);
+        backdrop-filter: blur(22px);
+        box-shadow: var(--shadow);
+      }
+      .form-panel h2 {
+        font-size: 1.3rem;
+        color: var(--navy);
+        margin-bottom: 6px;
+      }
+      .form-panel > p {
+        font-size: 0.88rem;
+        color: var(--muted);
+        margin-bottom: 22px;
+      }
+      .field-group {
+        display: grid;
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+      .field-group.two {
+        grid-template-columns: 1fr 1fr;
+      }
+      .field-group.three {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+      label.field {
+        display: grid;
+        gap: 6px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--navy);
+      }
+      label.field select,
+      label.field input {
+        min-height: 46px;
+        padding: 0 13px;
+        font-family: inherit;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text);
+        border: 1px solid rgba(8, 124, 166, 0.22);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.82);
+        outline: none;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+        cursor: pointer;
+      }
+      label.field select:focus,
+      label.field input:focus {
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 4px rgba(90, 217, 247, 0.2);
+        background: #fff;
+      }
+      .route-display {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 46px;
+        padding: 0 13px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--navy);
+        border: 1px solid rgba(8, 124, 166, 0.15);
+        border-radius: 8px;
+        background: rgba(8, 124, 166, 0.05);
+      }
+      .route-display i {
+        color: var(--cyan);
+      }
+      .predict-btn {
+        width: 100%;
+        min-height: 56px;
+        margin-top: 6px;
+        font-size: 1rem;
+        font-weight: 800;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #087ca6, #5ad9f7);
+        box-shadow: 0 14px 36px rgba(8, 124, 166, 0.26);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .predict-btn:hover:not(:disabled) {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 48px rgba(8, 124, 166, 0.3);
+      }
+      .predict-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* ── Loading ─────────────────────────────────────────────── */
+      .loading-panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 48px;
+        text-align: center;
+        color: var(--navy);
+      }
+      .spinner {
+        width: 42px;
+        height: 42px;
+        border: 4px solid rgba(8, 124, 166, 0.14);
+        border-top-color: var(--blue);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ── Results ─────────────────────────────────────────────── */
+      .results-section {
+        width: min(1200px, calc(100% - 36px));
+        margin: 0 auto 80px;
+      }
+      .results-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.6fr;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+      .result-card {
+        padding: 28px;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: var(--glass-strong);
+        backdrop-filter: blur(18px);
+        box-shadow: var(--shadow);
+      }
+      .delay-big {
+        font-size: 5rem;
+        font-weight: 800;
+        line-height: 1;
+        color: var(--navy);
+      }
+      .delay-unit {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--muted);
+        margin-left: 4px;
+      }
+      .result-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 8px;
+      }
+      .badge-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-weight: 800;
+      }
+      .badge-on-time {
+        background: rgba(14, 191, 122, 0.15);
+        color: #0ebf7a;
+        border: 1px solid rgba(14, 191, 122, 0.3);
+      }
+      .badge-slight {
+        background: rgba(90, 217, 247, 0.15);
+        color: #087ca6;
+        border: 1px solid rgba(90, 217, 247, 0.3);
+      }
+      .badge-moderate {
+        background: rgba(224, 160, 0, 0.15);
+        color: #b37a00;
+        border: 1px solid rgba(224, 160, 0, 0.3);
+      }
+      .badge-severe {
+        background: rgba(217, 52, 69, 0.15);
+        color: #d93445;
+        border: 1px solid rgba(217, 52, 69, 0.3);
+      }
+      .badge-confidence-high {
+        background: rgba(14, 191, 122, 0.12);
+        color: #0a9e66;
+        border: 1px solid rgba(14, 191, 122, 0.25);
+      }
+      .badge-confidence-medium {
+        background: rgba(224, 160, 0, 0.12);
+        color: #b37a00;
+        border: 1px solid rgba(224, 160, 0, 0.25);
+      }
+      .badge-confidence-low {
+        background: rgba(217, 52, 69, 0.12);
+        color: #c02030;
+        border: 1px solid rgba(217, 52, 69, 0.25);
+      }
+      .badge-urgency-low {
+        background: rgba(14, 191, 122, 0.12);
+        color: #0a9e66;
+      }
+      .badge-urgency-medium {
+        background: rgba(224, 160, 0, 0.12);
+        color: #b37a00;
+      }
+      .badge-urgency-high {
+        background: rgba(217, 52, 69, 0.12);
+        color: #c02030;
+      }
+
+      .agent-card {
+        grid-column: span 2;
+      }
+      .agent-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+      .agent-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #087ca6, #5ad9f7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.1rem;
+      }
+      .agent-msg {
+        font-size: 1.05rem;
+        color: var(--navy);
+        font-weight: 500;
+        line-height: 1.6;
+        margin-bottom: 12px;
+      }
+      .agent-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 8px;
+        background: rgba(8, 124, 166, 0.08);
+        color: var(--blue);
+        font-size: 0.88rem;
+        font-weight: 700;
+        border: 1px solid var(--border);
+        margin-bottom: 18px;
+      }
+      .alternatives-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+      }
+      .alt-card {
+        padding: 14px 16px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.6);
+      }
+      .alt-card strong {
+        display: block;
+        font-size: 0.92rem;
+        color: var(--navy);
+        margin-bottom: 4px;
+      }
+      .alt-card small {
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      /* ── SSE Reasoning Panel ─────────────────────────────────── */
+      .reasoning-section {
+        width: min(1200px, calc(100% - 36px));
+        margin: 0 auto 100px;
+      }
+      .reasoning-panel {
+        padding: 28px 32px;
+        border: 1px solid rgba(90, 217, 247, 0.35);
+        border-radius: 14px;
+        background: rgba(5, 56, 75, 0.88);
+        backdrop-filter: blur(22px);
+        box-shadow: 0 22px 60px rgba(3, 56, 76, 0.28);
+      }
+      .reasoning-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .reasoning-header .pulse {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--cyan);
+        box-shadow: 0 0 0 0 rgba(90, 217, 247, 0.6);
+        animation: pulse 1.8s ease infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(90, 217, 247, 0.6);
+        }
+        50% {
+          box-shadow: 0 0 0 9px rgba(90, 217, 247, 0);
+        }
+      }
+      .reasoning-header h3 {
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+      }
+      .reasoning-header small {
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+      .reasoning-text {
+        font-size: 0.96rem;
+        line-height: 1.75;
+        color: rgba(200, 235, 245, 0.9);
+        min-height: 72px;
+        font-family: inherit;
+        white-space: pre-wrap;
+      }
+      .cursor {
+        display: inline-block;
+        width: 2px;
+        height: 1em;
+        background: var(--cyan);
+        animation: blink 1s step-end infinite;
+        vertical-align: middle;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      /* ── Responsive ──────────────────────────────────────────── */
+      @media (max-width: 900px) {
+        .page-hero {
+          grid-template-columns: 1fr;
+          padding-top: 120px;
+        }
+        .results-grid {
+          grid-template-columns: 1fr;
+        }
+        .agent-card {
+          grid-column: span 1;
+        }
+        .mini-stats {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 600px) {
+        .field-group.two,
+        .field-group.three {
+          grid-template-columns: 1fr;
+        }
+        .delay-big {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── Nav ───────────────────────────────────────────────────── -->
+    <header class="site-header">
+      <nav class="navbar">
+        <a href="index4.html" class="logo" aria-label="RailMind AI home">
+          <span class="logo-mark"
+            ><i class="fa-solid fa-train-subway"></i
+          ></span>
+          <span>RailMind AI</span>
+        </a>
+        <button
+          class="nav-toggle"
+          type="button"
+          aria-label="Toggle navigation"
+          aria-expanded="false"
+        >
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="nav-menu">
+          <a href="index4.html">Home</a>
+          <a href="delay.html" style="color: var(--blue)">Delay Predictor</a>
+          <a href="crowd.html">Station Commander</a>
+          <a href="safety.html">Track Safety</a>
+          <a href="delay.html" class="nav-cta"
+            ><i class="fa-solid fa-brain"></i> Predict Now</a
+          >
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <!-- ── Hero + Form ──────────────────────────────────────────── -->
+      <div class="page-hero">
+        <div class="page-hero-content reveal">
+          <div class="eyebrow">
+            <i class="fa-solid fa-clock-rotate-left"></i> AI Delay Intelligence
+          </div>
+          <h1>Know your train delay before it happens</h1>
+          <p>
+            Our XGBoost model trained on 50,000 Indian Railways journeys
+            predicts delays and the RailMind Agent finds you better options —
+            automatically.
+          </p>
+          <div class="mini-stats" id="statsStrip">
+            <div class="mini-stat">
+              <strong id="statPredictions">—</strong>
+              <span>Predictions Today</span>
+            </div>
+            <div class="mini-stat">
+              <strong id="statAvgDelay">—</strong>
+              <span>Avg Delay (min)</span>
+            </div>
+            <div class="mini-stat">
+              <strong id="statOnTime">—</strong>
+              <span>On-Time %</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-panel reveal">
+          <h2>
+            <i class="fa-solid fa-route" style="color: var(--blue)"></i> Predict
+            Train Delay
+          </h2>
+          <p>
+            Select your train and journey details for an AI-powered delay
+            forecast.
+          </p>
+
+          <form id="delayForm" autocomplete="off">
+            <div class="field-group">
+              <label class="field">
+                Select Train
+                <select id="trainSelect" required>
+                  <option value="">Loading trains…</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="field-group">
+              <label class="field">
+                Route
+                <div class="route-display" id="routeDisplay">
+                  <i class="fa-solid fa-arrow-right-long"></i>
+                  <span id="routeText">Select a train above</span>
+                </div>
+              </label>
+            </div>
+
+            <div class="field-group three">
+              <label class="field">
+                Hour (0–23)
+                <select id="hourSelect">
+                  <option value="8" selected>08:00 (Peak)</option>
+                </select>
+              </label>
+              <label class="field">
+                Day of Week
+                <select id="daySelect">
+                  <option value="0">Monday</option>
+                  <option value="1">Tuesday</option>
+                  <option value="2">Wednesday</option>
+                  <option value="3">Thursday</option>
+                  <option value="4" selected>Friday</option>
+                  <option value="5">Saturday</option>
+                  <option value="6">Sunday</option>
+                </select>
+              </label>
+              <label class="field">
+                Month
+                <select id="monthSelect">
+                  <option value="1">January</option>
+                  <option value="2">February</option>
+                  <option value="3">March</option>
+                  <option value="4">April</option>
+                  <option value="5">May</option>
+                  <option value="6" selected>June</option>
+                  <option value="7">July</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
+                </select>
+              </label>
+            </div>
+
+            <button type="submit" class="predict-btn" id="predictBtn">
+              <i class="fa-solid fa-brain"></i> Predict Delay
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ── Loading ──────────────────────────────────────────────── -->
+      <div id="loadingPanel" class="loading-panel" style="display: none">
+        <div class="spinner"></div>
+        <p style="color: var(--navy); font-weight: 700">
+          Analyzing 50,000 journey patterns…
+        </p>
+        <small style="color: var(--muted)"
+          >RailMind Agent is calculating your route risk</small
+        >
+      </div>
+
+      <!-- ── Results ──────────────────────────────────────────────── -->
+      <div id="resultsSection" class="results-section" style="display: none">
+        <div class="section-heading" style="margin-bottom: 28px">
+          <span>Prediction Result</span>
+          <h2>Your journey analysis is ready</h2>
+        </div>
+        <div class="results-grid">
+          <!-- Delay number card -->
+          <div class="result-card">
+            <p class="result-label">Predicted Delay</p>
+            <div>
+              <span class="delay-big" id="delayNumber">0</span>
+              <span class="delay-unit">min</span>
+            </div>
+            <div class="badge-row">
+              <span class="badge" id="categoryBadge">—</span>
+              <span class="badge" id="confidenceBadge">—</span>
+            </div>
+            <p
+              style="margin-top: 16px; font-size: 0.82rem; color: var(--muted)"
+              id="mockNote"
+            ></p>
+          </div>
+
+          <!-- Train + urgency card -->
+          <div class="result-card">
+            <p class="result-label">Journey Details</p>
+            <p
+              style="
+                font-size: 1.5rem;
+                font-weight: 800;
+                color: var(--navy);
+                margin-bottom: 4px;
+              "
+              id="resTrainName"
+            >
+              —
+            </p>
+            <p
+              style="
+                font-size: 1rem;
+                color: var(--blue);
+                font-weight: 600;
+                margin-bottom: 14px;
+              "
+              id="resRoute"
+            >
+              —
+            </p>
+            <div class="badge-row">
+              <span
+                style="
+                  font-size: 0.82rem;
+                  font-weight: 700;
+                  color: var(--muted);
+                "
+                >Urgency:</span
+              >
+              <span class="badge" id="urgencyBadge">—</span>
+            </div>
+            <div
+              id="actionNeeded"
+              style="
+                margin-top: 16px;
+                padding: 12px;
+                border-radius: 8px;
+                background: rgba(8, 124, 166, 0.07);
+                border: 1px solid var(--border);
+                font-size: 0.88rem;
+                color: var(--navy);
+                font-weight: 600;
+                display: none;
+              "
+            >
+              <i
+                class="fa-solid fa-bolt"
+                style="color: var(--cyan); margin-right: 6px"
+              ></i>
+              <span id="actionText"></span>
+            </div>
+          </div>
+
+          <!-- Agent card -->
+          <div class="result-card agent-card">
+            <div class="agent-header">
+              <div class="agent-icon"><i class="fa-solid fa-robot"></i></div>
+              <div>
+                <strong style="color: var(--navy); font-size: 1rem"
+                  >RailMind Agent</strong
+                >
+                <small
+                  style="display: block; color: var(--muted); font-size: 0.8rem"
+                  >AI-powered passenger advisory</small
+                >
+              </div>
+            </div>
+            <p class="agent-msg" id="agentMsg">—</p>
+            <p
+              id="agentReasoning"
+              style="
+                font-size: 0.86rem;
+                color: var(--muted);
+                line-height: 1.6;
+                padding: 12px;
+                border-radius: 8px;
+                background: rgba(8, 124, 166, 0.04);
+                border: 1px solid var(--border);
+                display: none;
+              "
+            ></p>
+            <div id="alternativesSection" style="display: none">
+              <p
+                style="
+                  font-size: 0.84rem;
+                  font-weight: 700;
+                  color: var(--navy);
+                  margin-top: 18px;
+                  margin-bottom: 10px;
+                "
+              >
+                <i class="fa-solid fa-shuffle" style="color: var(--cyan)"></i>
+                Suggested Alternatives
+              </p>
+              <div class="alternatives-grid" id="alternativesGrid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Agent Reasoning Stream ────────────────────────────────── -->
+      <div
+        id="reasoningSection"
+        class="reasoning-section"
+        style="display: none"
+      >
+        <div class="reasoning-panel">
+          <div class="reasoning-header">
+            <div class="pulse" id="streamPulse" style="display: none"></div>
+            <h3>Live Agent Reasoning</h3>
+            <small id="streamStatus" style="margin-left: auto">Waiting…</small>
+          </div>
+          <div class="reasoning-text" id="reasoningText">
+            <span class="cursor"></span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ── Footer ───────────────────────────────────────────────── -->
+    <footer id="contact" class="footer">
+      <div class="footer-grid">
+        <div>
+          <a href="index4.html" class="logo">
+            <span class="logo-mark"
+              ><i class="fa-solid fa-train-subway"></i
+            ></span>
+            <span>RailMind AI</span>
+          </a>
+          <p>
+            AI-powered Indian Railways intelligence — delay prediction, crowd
+            forecasting, track safety.
+          </p>
+        </div>
+        <div>
+          <h3>Modules</h3>
+          <a href="delay.html">Delay Predictor</a>
+          <a href="crowd.html">Station Commander</a>
+          <a href="safety.html">Track Safety</a>
+        </div>
+        <div>
+          <h3>Project</h3>
+          <a href="index4.html#about">About</a>
+          <a href="index4.html#team">Team</a>
+          <a href="index4.html#features">Features</a>
+        </div>
+        <div>
+          <h3>Built for</h3>
+          <p><i class="fa-solid fa-trophy"></i> FAR AWAY 2026</p>
+          <p><i class="fa-solid fa-train"></i> Railway Theme</p>
+          <p><i class="fa-solid fa-location-dot"></i> India</p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        RailMind AI © 2026 · FAR AWAY Hackathon · Railway Theme
+      </div>
+    </footer>
+
+    <script src="train.js"></script>
+    <script>
+      const API = "https://railmindbackend-production.up.railway.app";
+      let trains = [];
+      let currentEventSource = null;
+
+      // ── Populate hour select ─────────────────────────────────────
+      const hourSel = document.getElementById("hourSelect");
+      hourSel.innerHTML = Array.from({ length: 24 }, (_, i) => {
+        const label =
+          i === 0
+            ? "12:00 AM"
+            : i < 12
+              ? `${i}:00 AM`
+              : i === 12
+                ? "12:00 PM"
+                : `${i - 12}:00 PM`;
+        const peak = [7, 8, 9, 17, 18, 19, 20].includes(i) ? " (Peak)" : "";
+        return `<option value="${i}"${i === 8 ? " selected" : ""}>${String(i).padStart(2, "0")}:00 — ${label}${peak}</option>`;
+      }).join("");
+
+      // ── Load trains from API ─────────────────────────────────────
+      async function loadTrains() {
+        try {
+          const res = await fetch(`${API}/delay/trains`);
+          const data = await res.json();
+          trains = data.trains || [];
+          const sel = document.getElementById("trainSelect");
+          sel.innerHTML = '<option value="">Choose a train…</option>';
+          trains.forEach((t) => {
+            const opt = document.createElement("option");
+            opt.value = t.train_number;
+            opt.textContent = `${t.train_number} — ${t.train_name}`;
+            opt.dataset.source = t.source_code;
+            opt.dataset.dest = t.destination_code;
+            opt.dataset.name = t.train_name;
+            sel.appendChild(opt);
+          });
+        } catch (e) {
+          console.warn("Could not load trains:", e);
+          // Fallback trains
+          const sel = document.getElementById("trainSelect");
+          sel.innerHTML = `
+          <option value="">Choose a train…</option>
+          <option value="12301" data-source="HWH" data-dest="NDLS" data-name="Howrah Rajdhani Express">12301 — Howrah Rajdhani Express</option>
+          <option value="22439" data-source="NDLS" data-dest="VBS" data-name="Vande Bharat Express">22439 — New Delhi Vande Bharat Express</option>
+          <option value="12002" data-source="NDLS" data-dest="BPL" data-name="Bhopal Shatabdi Express">12002 — Bhopal Shatabdi Express</option>
+        `;
+        }
+      }
+
+      // ── Load stats ───────────────────────────────────────────────
+      async function loadStats() {
+        try {
+          const res = await fetch(`${API}/delay/stats`);
+          const d = await res.json();
+          document.getElementById("statPredictions").textContent =
+            d.predictions_today?.toLocaleString() || "—";
+          document.getElementById("statAvgDelay").textContent =
+            d.avg_delay_minutes || "—";
+          document.getElementById("statOnTime").textContent =
+            d.on_time_percentage + "%";
+        } catch (e) {
+          document.getElementById("statPredictions").textContent = "1,024";
+          document.getElementById("statAvgDelay").textContent = "18.4";
+          document.getElementById("statOnTime").textContent = "61.3%";
+        }
+      }
+
+      // ── Train select change ──────────────────────────────────────
+      document
+        .getElementById("trainSelect")
+        .addEventListener("change", function () {
+          const opt = this.options[this.selectedIndex];
+          const src = opt.dataset.source || "";
+          const dest = opt.dataset.dest || "";
+          const txt = document.getElementById("routeText");
+          if (src && dest) {
+            txt.textContent = `${src}  →  ${dest}`;
+          } else {
+            txt.textContent = "Select a train above";
+          }
+        });
+
+      // ── Badge helpers ─────────────────────────────────────────────
+      function categoryClass(c) {
+        return (
+          {
+            on_time: "badge-on-time",
+            slight: "badge-slight",
+            moderate: "badge-moderate",
+            severe: "badge-severe",
+          }[c] || "badge-slight"
+        );
+      }
+      function categoryLabel(c) {
+        return (
+          {
+            on_time: "✓ On Time",
+            slight: "Slight Delay",
+            moderate: "Moderate Delay",
+            severe: "Severe Delay",
+          }[c] || c
+        );
+      }
+      function confidenceClass(c) {
+        return (
+          {
+            high: "badge-confidence-high",
+            medium: "badge-confidence-medium",
+            low: "badge-confidence-low",
+          }[c] || "badge-confidence-medium"
+        );
+      }
+      function urgencyClass(u) {
+        return (
+          {
+            low: "badge-urgency-low",
+            medium: "badge-urgency-medium",
+            high: "badge-urgency-high",
+          }[u] || "badge-urgency-low"
+        );
+      }
+      function urgencyIcon(u) {
+        return (
+          {
+            low: "fa-leaf",
+            medium: "fa-triangle-exclamation",
+            high: "fa-circle-exclamation",
+          }[u] || "fa-leaf"
+        );
+      }
+
+      // ── Form submit ──────────────────────────────────────────────
+      document
+        .getElementById("delayForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const trainSel = document.getElementById("trainSelect");
+          const trainOpt = trainSel.options[trainSel.selectedIndex];
+          const trainNum = trainSel.value;
+          if (!trainNum) {
+            alert("Please select a train first.");
+            return;
+          }
+
+          const source = trainOpt.dataset.source || "";
+          const dest = trainOpt.dataset.dest || "";
+          const route = `${source} → ${dest}`;
+          const hour = parseInt(document.getElementById("hourSelect").value);
+          const dow = parseInt(document.getElementById("daySelect").value);
+          const month = parseInt(document.getElementById("monthSelect").value);
+
+          // Close any existing SSE stream
+          if (currentEventSource) {
+            currentEventSource.close();
+            currentEventSource = null;
+          }
+
+          document.getElementById("resultsSection").style.display = "none";
+          document.getElementById("reasoningSection").style.display = "none";
+          document.getElementById("loadingPanel").style.display = "flex";
+          document.getElementById("predictBtn").disabled = true;
+          document.getElementById("predictBtn").innerHTML =
+            '<i class="fa-solid fa-spinner fa-spin"></i> Predicting…';
+
+          try {
+            const res = await fetch(`${API}/delay/predict`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                train_number: trainNum,
+                source: source,
+                destination: dest,
+                hour: hour,
+                day_of_week: dow,
+                month: month,
+              }),
+            });
+            if (!res.ok) throw new Error(`API error ${res.status}`);
+            const d = await res.json();
+
+            document.getElementById("loadingPanel").style.display = "none";
+            renderResults(d, trainOpt.dataset.name || trainNum, route);
+            startReasoningStream(trainNum, d.predicted_delay_minutes, route);
+          } catch (err) {
+            document.getElementById("loadingPanel").style.display = "none";
+            alert(
+              `Prediction failed: ${err.message}\n\nMake sure the backend is running at ${API}`,
+            );
+          } finally {
+            document.getElementById("predictBtn").disabled = false;
+            document.getElementById("predictBtn").innerHTML =
+              '<i class="fa-solid fa-brain"></i> Predict Delay';
+          }
+        });
+
+      // ── Render results ───────────────────────────────────────────
+      function renderResults(d, trainName, route) {
+        document.getElementById("delayNumber").textContent = Math.round(
+          d.predicted_delay_minutes,
+        );
+        document.getElementById("resTrainName").textContent = trainName;
+        document.getElementById("resRoute").textContent = d.route || route;
+
+        const catBadge = document.getElementById("categoryBadge");
+        catBadge.className = "badge " + categoryClass(d.delay_category);
+        catBadge.textContent = categoryLabel(d.delay_category);
+
+        const confBadge = document.getElementById("confidenceBadge");
+        confBadge.className = "badge " + confidenceClass(d.confidence);
+        confBadge.innerHTML = `<i class="fa-solid fa-gauge-high"></i> ${d.confidence?.charAt(0).toUpperCase() + d.confidence?.slice(1)} Confidence`;
+
+        const urgBadge = document.getElementById("urgencyBadge");
+        urgBadge.className = "badge " + urgencyClass(d.urgency);
+        urgBadge.innerHTML = `<i class="fa-solid ${urgencyIcon(d.urgency)}"></i> ${d.urgency?.charAt(0).toUpperCase() + d.urgency?.slice(1)} Urgency`;
+
+        const mockNote = document.getElementById("mockNote");
+        mockNote.textContent = d.is_mock
+          ? "⚠ Running in mock mode — train the model for real predictions."
+          : "";
+
+        if (d.action_needed) {
+          document.getElementById("actionText").textContent = d.action_needed;
+          document.getElementById("actionNeeded").style.display = "block";
+        }
+
+        document.getElementById("agentMsg").textContent =
+          d.agent_suggestion || "Agent advisory not available.";
+
+        if (d.agent_reasoning) {
+          const r = document.getElementById("agentReasoning");
+          r.textContent = d.agent_reasoning;
+          r.style.display = "block";
+        }
+
+        if (d.suggested_alternatives?.length > 0) {
+          const grid = document.getElementById("alternativesGrid");
+          grid.innerHTML = d.suggested_alternatives
+            .map(
+              (a) => `
+          <div class="alt-card">
+            <strong><i class="fa-solid fa-train" style="color:var(--cyan);margin-right:6px"></i>${a.train_name || a.train_number}</strong>
+            <small>${a.note || "Alternative route available"}</small>
+          </div>
+        `,
+            )
+            .join("");
+          document.getElementById("alternativesSection").style.display =
+            "block";
+        }
+
+        document.getElementById("resultsSection").style.display = "block";
+        document
+          .getElementById("resultsSection")
+          .scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      // ── SSE Reasoning Stream ─────────────────────────────────────
+      function startReasoningStream(trainNum, delayMin, route) {
+        const section = document.getElementById("reasoningSection");
+        const textEl = document.getElementById("reasoningText");
+        const pulse = document.getElementById("streamPulse");
+        const status = document.getElementById("streamStatus");
+
+        section.style.display = "block";
+        textEl.innerHTML = '<span class="cursor"></span>';
+        pulse.style.display = "block";
+        status.textContent = "Streaming…";
+        let text = "";
+
+        const url = `${API}/delay/agent-stream?train_number=${encodeURIComponent(trainNum)}&delay_minutes=${delayMin}&route=${encodeURIComponent(route)}`;
+        currentEventSource = new EventSource(url);
+
+        currentEventSource.onmessage = (e) => {
+          if (e.data === "[DONE]") {
+            currentEventSource.close();
+            textEl.innerHTML = text;
+            pulse.style.display = "none";
+            status.textContent = "Analysis complete";
+            return;
+          }
+          text += e.data;
+          textEl.innerHTML = text + '<span class="cursor"></span>';
+        };
+
+        currentEventSource.onerror = () => {
+          currentEventSource.close();
+          pulse.style.display = "none";
+          status.textContent = "Stream ended";
+          if (!text) {
+            textEl.innerHTML = `Analyzing train ${trainNum} with a predicted delay of ${Math.round(delayMin)} minutes. The RailMind Agent has assessed your journey and provided recommendations above.`;
+          }
+        };
+
+        section.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      // ── Init ─────────────────────────────────────────────────────
+      loadTrains();
+      loadStats();
+    </script>
+  </body>
+</html>
