@@ -48,6 +48,7 @@
       background: linear-gradient(140deg, rgba(90, 217, 247, 0.10), transparent 55%);
       opacity: 0;
       transition: opacity 0.3s ease;
+      pointer-events: none;
     }
 
     .module-card:hover {
@@ -116,6 +117,8 @@
       transition: transform 0.2s ease, box-shadow 0.2s ease;
       text-decoration: none;
       cursor: pointer;
+      position: relative;
+      z-index: 2;
     }
 
     .module-launch-btn:hover {
@@ -210,13 +213,13 @@
       </button>
 
       <div class="nav-menu">
-        <a href="index.html">Home</a>
+        <a href="index4.html">Home</a>
         <a href="delay.html">Delay Predictor</a>
         <a href="crowd.html">Station Commander</a>
         <a href="safety.html">Track Safety</a>
         <a href="#about">About</a>
         <a href="#team">Team</a>
-        <a href="delay.html" class="nav-cta">Get Started</a>
+        <a href="#modules" class="nav-cta">Get Started</a>
       </div>
     </nav>
   </header>
@@ -381,14 +384,15 @@
             </a>
           </div>
 
-<!-- card 4 maintenance -->
+          <!-- card 4 maintenance -->
           <div class="module-card reveal">
             <span class="module-card-number" style="color: rgb(22 85 100 / 71%);">04</span>
             <div class="module-icon-wrap">
               <i class="fa-solid fa-wrench"></i>
             </div>
             <h3>Maintenance Scheduler</h3>
-            <p>AI-powered maintenance planning optimizes resource allocation and scheduling for efficient track upkeep.</p>
+            <p>AI-powered maintenance planning optimizes resource allocation and scheduling for efficient track upkeep.
+            </p>
             <a href="index(maintenance).html" class="module-launch-btn">
               Launch <i class="fa-solid fa-arrow-right"></i>
             </a>
@@ -545,21 +549,54 @@
     </section>
 
     <!-- ══════════════════════════ TEAM ══════════════════════════════════════ -->
-    <section id="team" class="team-strip section-shell">
+      <section id="team" class="team-strip section-shell">
       <div class="section-heading reveal">
         <span>Team</span>
-        <h2>Product, AI, and engineering working together</h2>
+        <h2>Meet the minds behind RailMind AI</h2>
       </div>
       <div class="team-grid">
-        <div class="team-card reveal"><i class="fa-solid fa-user-gear"></i><strong>AI Engineer</strong><small>Detection
-            &amp; prediction models</small></div>
-        <div class="team-card reveal"><i class="fa-solid fa-user-shield"></i><strong>Safety Analyst</strong><small>Risk
-            logic &amp; defect classes</small></div>
-        <div class="team-card reveal"><i class="fa-solid fa-code"></i><strong>Frontend
-            Developer</strong><small>Dashboard UI &amp; platform</small></div>
+
+        <!-- Jay -->
+        <div class="team-card reveal">
+          <span class="team-number">01</span>
+          <div class="team-avatar">J</div>
+          <strong>Jay</strong>
+          <span class="team-role">Frontend Developer</span>
+          <small>UI/UX design, dashboard interface &amp; platform experience</small>
+          <div class="team-socials">
+            <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          </div>
+        </div>
+
+        <!-- Harsh -->
+        <div class="team-card reveal">
+          <span class="team-number">02</span>
+          <div class="team-avatar">H</div>
+          <strong>Harsh</strong>
+          <span class="team-role">Backend Developer</span>
+          <small>API architecture, data pipelines &amp; ML model integration</small>
+          <div class="team-socials">
+            <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+            <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          </div>
+        </div>
+
+        <!-- Atharv -->
+        <div class="team-card reveal">
+          <span class="team-number">03</span>
+          <div class="team-avatar">A</div>
+          <strong>Atharv</strong>
+          <span class="team-role">Presentation Lead</span>
+          <small>Pitch decks, demo video production &amp; hackathon storytelling</small>
+          <div class="team-socials">
+            <a href="#" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+          </div>
+        </div>
+
       </div>
     </section>
-
   </main>
 
   <!-- ═══════════════════════════════ FOOTER ══════════════════════════════════ -->
